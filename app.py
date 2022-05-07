@@ -19,7 +19,7 @@ Unauthenticated Route:
 """
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "m9BHAdR5XleSJU3iOpv"
+app.config["SECRET_KEY"] = "0X41v4FK8A2cbw1hHFFJCwTGZXvuxM592QRrmCzh"
 csrf = CSRFProtect(app)
 
 
@@ -27,6 +27,8 @@ csrf = CSRFProtect(app)
 def home():
     # Templates are the way to go. Even though you can import `escape` from the `markupsafe` package,
     # always opt to use templating languages, because they're safe by always automatically escaping input field.
+
+    # If we're not logged in just show the login page, otherwise show the person's dashboard
     if not logged_in():
         return render_template("login.html")
     return redirect("/dashboard")
@@ -40,6 +42,8 @@ def login():
     if not user:
         return render_template("login.html", error="Invalid credentials")
     response = make_response(redirect("/dashboard"))
+    # This steps is important as it sets the cookie in the client that let's us know
+    # the person is authenticated
     response.set_cookie("auth_token", user["token"])
     return response, 303
 

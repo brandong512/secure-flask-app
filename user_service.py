@@ -21,6 +21,15 @@ The flow of authenticating a user looks something like this
 
 
 def get_user_with_credentials(email, password):
+    """Checking for a user in the database
+    1. Check the database for a user with the email requested
+        2. If there is no such email --> Display error message
+        3. If there is, use hashing function to check and see if inputted password has
+           matches the stored & salted password hash
+        4. If they match, create token, and send back to the user
+        5. If they don't match --> Display error message
+    """
+
     try:
         con = sqlite3.connect("bank.db")
         cur = con.cursor()
@@ -33,6 +42,7 @@ def get_user_with_credentials(email, password):
         if row is None:
             return None
         email, name, hash = row
+        # We use pbkdf2_sha256 to check the password (automatically salted)
         if not pbkdf2_sha256.verify(password, hash):
             return None
         return {"email": email, "name": name, "token": create_token(email)}
@@ -41,16 +51,20 @@ def get_user_with_credentials(email, password):
 
 
 def logged_in():
+    # We can see if this person is logged in by checking to see if in
+    # their cookies they have the auth_token parameter set
     token = request.cookies.get("auth_token")
     try:
+        # If we're able to decode the JWT with our secret successfully we're good
         data = jwt.decode(token, SECRET, algorithms=["HS256"])
         g.user = data["sub"]
         return True
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError:  # Otherwise, that's an invalid token
         return False
 
 
 def create_token(email):
+    # This is the standard formot for JWT's, and we can use the handy jwt library to make our own with a secret
     now = datetime.utcnow()
     payload = {"sub": email, "iat": now, "exp": now + timedelta(minutes=60)}
     token = jwt.encode(payload, SECRET, algorithm="HS256")

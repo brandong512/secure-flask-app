@@ -10,6 +10,7 @@
   To     <input name="to" />
   Amount <input name="amount" />
          <input type="submit" value="Transfer">
+         <!--This line of code prevents our form from CSRF attacks. Refer to app.py for the secret and initial setup-->
          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   </pre>
 </form>

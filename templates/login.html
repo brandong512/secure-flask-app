@@ -27,6 +27,8 @@
 
         <div class="m-3">
           <button type="submit" value="Login" class="btn btn-primary">Sign in</button>
+
+          <!--This line of code prevents our form from CSRF attacks. Refer to app.py for the secret and initial setup-->
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         </div>
     </form>

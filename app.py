@@ -72,10 +72,13 @@ def details():
     )
 
 
-@app.route("/transfer", methods=["POST"])
+@app.route("/transfer", methods=["GET", "POST"])
 def transfer():
     if not logged_in():
         return render_template("login.html")
+    elif logged_in() and request.method == "GET":
+        return render_template("transfer.html")
+
     source = request.form.get("from")
     target = request.form.get("to")
     amount = int(request.form.get("amount"))

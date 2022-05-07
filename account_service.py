@@ -5,6 +5,9 @@ def get_balance(account_number, owner):
     try:
         con = sqlite3.connect("bank.db")
         cur = con.cursor()
+        # Example of a prepared statements, which protects us from SQL injection
+        # attacks. Trying to build queries by building strings/using string interpolation
+        # is dangerous and should never be used.
         cur.execute(
             """
             SELECT balance FROM accounts where id=? and owner=?""",

@@ -27,6 +27,7 @@ csrf = CSRFProtect(app)
 def home():
     # Templates are the way to go. Even though you can import `escape` from the `markupsafe` package,
     # always opt to use templating languages, because they're safe by always automatically escaping input field.
+    # This increases our protection from XSS attacks.
 
     # If we're not logged in just show the login page, otherwise show the person's dashboard
     if not logged_in():

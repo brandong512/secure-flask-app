@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, redirect, render_template
+from flask import Flask, request, make_response, redirect, render_template, g
 from user_service import get_user_with_credentials, logged_in
 from account_service import get_balance
 from flask_wtf.csrf import CSRFProtect
@@ -19,7 +19,7 @@ Unauthenticated Route:
 """
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "yoursupersecrettokenhere"
+app.config["SECRET_KEY"] = "m9BHAdR5XleSJU3iOpv"
 csrf = CSRFProtect(app)
 
 

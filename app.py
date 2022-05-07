@@ -1,8 +1,7 @@
 from flask import Flask, request, make_response, redirect, render_template
 from user_service import get_user_with_credentials, logged_in
-
-
-app = Flask(__name__)
+from account_service import get_balance
+from flask_wtf.csrf import CSRFProtect
 
 """ Authentication route flow
 
@@ -18,6 +17,10 @@ Unauthenticated Route:
 **Routes that do not require authentication, are exempt from this process
 
 """
+
+app = Flask(__name__)
+app.config["SECRET_KEY"] = "yoursupersecrettokenhere"
+csrf = CSRFProtect(app)
 
 
 @app.route("/", methods=["GET"])
@@ -56,16 +59,44 @@ def dashboard():
     return render_template("dashboard.html", email=g.user)
 
 
-@app.route("/details", methods=["GET", "POST"])
+@app.route("/details", methods=["GET"])
 def details():
     if not logged_in():
         return render_template("login.html")
     account_number = request.args["account"]
-    return render_template("details.html", account_number=account_number)
+    return render_template(
+        "details.html",
+        user=g.user,
+        account_number=account_number,
+        balance=get_balance(account_number, g.user),
+    )
 
 
-@app.route("/transfer", methods=["GET"])
+@app.route("/transfer", methods=["POST"])
 def transfer():
     if not logged_in():
         return render_template("login.html")
-    return render_template("transfer.html")
+    source = request.form.get("from")
+    target = request.form.get("to")
+    amount = int(request.form.get("amount"))
+
+    # TODO - add a check to make sure no strings (Just integers are passed in)
+
+    if amount < 0:
+        abort(400, "NO STEALING")
+    if amount > 1000:
+        abort(400, "WOAH THERE TAKE IT EASY")
+
+    available_balance = get_balance(source, g.user)
+    if available_balance is None:
+        abort(404, "Account not found")
+    if amount > available_balance:
+        abort(400, "You don't have that much")
+
+    if do_transfer(source, target, amount):
+        pass  # TODO GIVE FEEDBACK
+    else:
+        abort(400, "Something bad happened")
+
+    response = make_response(redirect("/dashboard"))
+    return response, 303

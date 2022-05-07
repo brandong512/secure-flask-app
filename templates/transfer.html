@@ -6,6 +6,7 @@
   To     <input name="to" />
   Amount <input name="amount" />
          <input type="submit" value="Transfer">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   </pre>
   <-- WARNING WARNING THERE IS A CSRF VULNERABILITY HERE!!! -->
   <-- WE WILL BE FIXING IT LATER.                           -->

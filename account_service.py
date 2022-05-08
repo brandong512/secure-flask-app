@@ -21,6 +21,24 @@ def get_balance(account_number, owner):
         con.close()
 
 
+def get_owner_accounts(owner):
+    try:
+        print("inside: ", owner)
+        con = sqlite3.connect("bank.db")
+        cur = con.cursor()
+        cur.execute(
+            """
+            SELECT id FROM accounts where owner=?""",
+            (owner,),
+        )
+        rows = cur.fetchall()
+        if rows is None:
+            return None
+        return rows
+    finally:
+        con.close()
+
+
 def do_transfer(source, target, amount):
     try:
         con = sqlite3.connect("bank.db")

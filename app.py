@@ -1,6 +1,6 @@
-from flask import Flask, request, make_response, redirect, render_template, g
+from flask import Flask, request, make_response, redirect, render_template, g, abort
 from user_service import get_user_with_credentials, logged_in
-from account_service import get_balance
+from account_service import get_balance, get_owner_accounts
 from flask_wtf.csrf import CSRFProtect
 
 """ Authentication route flow
@@ -41,7 +41,10 @@ def login():
     password = request.form.get("password")
     user = get_user_with_credentials(email, password)
     if not user:
-        return render_template("login.html", error="Invalid credentials")
+        return render_template(
+            "login.html",
+            error="Invalid credentials",
+        )
     response = make_response(redirect("/dashboard"))
     # This steps is important as it sets the cookie in the client that let's us know
     # the person is authenticated
@@ -61,7 +64,12 @@ def dashboard():
     # e.g of a protected route that requires auth
     if not logged_in():
         return render_template("login.html")
-    return render_template("dashboard.html", email=g.user)
+    owned_accounts = get_owner_accounts(g.user)
+    print(owned_accounts)
+    owned_accounts = [account[0] for account in owned_accounts]
+    return render_template(
+        "dashboard.html", logged_in=logged_in(), user=g.user, accounts=owned_accounts
+    )
 
 
 @app.route("/details", methods=["GET"])
@@ -69,11 +77,16 @@ def details():
     if not logged_in():
         return render_template("login.html")
     account_number = request.args["account"]
+
+    if get_balance(account_number, g.user) is None:
+        abort(404, "Account not found")
+
     return render_template(
         "details.html",
         user=g.user,
         account_number=account_number,
         balance=get_balance(account_number, g.user),
+        logged_in=logged_in(),
     )
 
 
@@ -82,7 +95,7 @@ def transfer():
     if not logged_in():
         return render_template("login.html")
     elif logged_in() and request.method == "GET":
-        return render_template("transfer.html")
+        return render_template("transfer.html", logged_in=logged_in(), user=g.user)
 
     source = request.form.get("from")
     target = request.form.get("to")

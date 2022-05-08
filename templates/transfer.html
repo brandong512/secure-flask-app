@@ -2,18 +2,56 @@
 {% block title %}Transfer{% endblock %}
 
 {% block content %}
-<h1>Make a Transfer</h1>
+<h1 class="m-4">Make a Transfer</h1>
 
-<form method="POST" action="/transfer">
-  <pre>
-  From   <input name="from" />
-  To     <input name="to" />
-  Amount <input name="amount" />
-         <input type="submit" value="Transfer">
-         <!--This line of code prevents our form from CSRF attacks. Refer to app.py for the secret and initial setup-->
-         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-  </pre>
-</form>
-<p><a href="/dashboard">Back to Dashboard</a></p>
+<div class="d-flex justify-content-center container">
+  <form method="POST" action="/transfer">
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="inputGroup-sizing-default">From</span>
+      <input name="from" class="form-control" aria-label="Sizing example input"
+        aria-describedby="inputGroup-sizing-default">
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="inputGroup-sizing-default">To</span>
+      <input name="to" class="form-control" aria-label="Sizing example input"
+        aria-describedby="inputGroup-sizing-default">
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="inputGroup-sizing-default">Amount</span>
+      <input type="number" class="form-control" aria-label="Sizing example input"
+        aria-describedby="inputGroup-sizing-default">
+    </div>
+    <div class="row d-flex flex-row justify-content-start">
+      <div class="col">
+        <button id="submit_button" class="btn btn-warning">Transfer</button>
+      </div>
+      <div class="col d-flex justify-content-end">
+
+
+        <div id="spinner" class="">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!--This line of code prevents our form from CSRF attacks. Refer to app.py for the secret and initial setup-->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  </form>
+</div>
+
+<script>
+  const button = document.getElementById("submit_button")
+  const spinner = document.getElementById("spinner")
+  const addSpinnerClass = () => {
+    spinner.classList.add("lds-ring");
+  }
+  button.addEventListener("click", addSpinnerClass);
+
+
+</script>
 
 {% endblock %}

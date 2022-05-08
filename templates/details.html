@@ -1,10 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Details{% endblock %}
 
-{% block content %}
-<p>Hi, {{ user }}</p>
 
-<h1>Details for Account {{account_number}}</h1>
-<p>Your balance is {{ balance }}</p>
-<p><a href="/dashboard">Back to Dashboard</a></p>
+
+{% block content %}
+
+
+<h1 class="m-4">Details for Account {{account_number}}</h1>
+<div class="d-flex justify-content-center container">
+    <h4>Your balance is ${{ balance }}</h4>
+</div>
+
+<script>
+    let counts = setInterval(updated);
+    let upto = 0;
+    const updated = () => {
+        let count = document.getElementById("counter");
+        count.innerHTML = ++upto;
+        if (upto === 1000) {
+            clearInterval(counts);
+        }
+    }
+</script>
 {% endblock %}

@@ -2,6 +2,17 @@
 {% block title %}Transfer{% endblock %}
 
 {% block content %}
+
+{% if transfer_status == "success" %}
+<div class="m-3 alert alert-success alert-message-slide" role="alert">
+  Transfer was succesfully completed
+</div>
+{% elif transfer_status == "failed" %}
+<div class="m-3 alert alert-danger alert-message-slide" role="alert">
+  Transfer failed!
+</div>
+{% endif %}
+
 <h1 class="m-4">Make a Transfer</h1>
 
 <div class="d-flex justify-content-center container">
@@ -18,7 +29,7 @@
     </div>
     <div class="input-group mb-3">
       <span class="input-group-text" id="inputGroup-sizing-default">Amount</span>
-      <input type="number" class="form-control" aria-label="Sizing example input"
+      <input type="number" name="amount" class="form-control" aria-label="Sizing example input"
         aria-describedby="inputGroup-sizing-default">
     </div>
     <div class="row d-flex flex-row justify-content-start">
@@ -44,9 +55,12 @@
 </div>
 
 <script>
+
+
+
   const button = document.getElementById("submit_button")
   const spinner = document.getElementById("spinner")
-  const addSpinnerClass = () => {
+  const addSpinnerClass = (name, email) => {
     spinner.classList.add("lds-ring");
   }
   button.addEventListener("click", addSpinnerClass);

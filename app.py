@@ -1,7 +1,17 @@
-from flask import Flask, request, make_response, redirect, render_template, g, abort
+from logging.config import valid_ident
+from flask import (
+    Flask,
+    request,
+    make_response,
+    redirect,
+    render_template,
+    g,
+    abort,
+)
 from user_service import get_user_with_credentials, logged_in
-from account_service import get_balance, get_owner_accounts
+from account_service import get_balance, get_owner_accounts, do_transfer
 from flask_wtf.csrf import CSRFProtect
+from validator import Validation
 
 """ Authentication route flow
 
@@ -90,6 +100,21 @@ def details():
     )
 
 
+""" Transfer feature workflow
+
+During a transfer there are many areas that need to be validated. Here are the following scenarios
+that we've added some validation against:
+
+1. Transfer amount negative (to prevent withdrawing from other accounts)
+2. No transfers greater than $1000
+3. Transfering money out of other people's accounts
+4. Transferring more money than you actually have
+6. Empty strings protection
+7. Protection against non-numbers
+    
+"""
+
+
 @app.route("/transfer", methods=["GET", "POST"])
 def transfer():
     if not logged_in():
@@ -99,9 +124,23 @@ def transfer():
 
     source = request.form.get("from")
     target = request.form.get("to")
-    amount = int(request.form.get("amount"))
+    amount = request.form.get("amount")
 
-    # TODO - add a check to make sure no strings (Just integers are passed in)
+    if (
+        Validation.isBlank(source)
+        or Validation.isBlank(target)
+        or Validation.isBlank(amount)
+    ):
+        abort(400, "No blank fields")
+
+    if (
+        not Validation.isNumericString(source)
+        or not Validation.isNumericString(target)
+        or not Validation.isNumericString(amount)
+    ):
+        abort(400, "Only numbers allowed in fields")
+
+    amount = int(amount)
 
     if amount < 0:
         abort(400, "NO STEALING")
@@ -114,8 +153,22 @@ def transfer():
     if amount > available_balance:
         abort(400, "You don't have that much")
 
-    if do_transfer(source, target, amount):
-        pass  # TODO GIVE FEEDBACK
+    transfer_success = do_transfer(source, target, amount)
+
+    if transfer_success:
+        return render_template(
+            "transfer.html",
+            transfer_status="success",
+            logged_in=logged_in(),
+            user=g.user,
+        )
+    if not transfer_success:
+        return render_template(
+            "transfer.html",
+            transfer_status="failed",
+            logged_in=logged_in(),
+            user=g.user,
+        )
     else:
         abort(400, "Something bad happened")
 

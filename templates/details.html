@@ -8,18 +8,26 @@
 
 <h1 class="m-4">Details for Account {{account_number}}</h1>
 <div class="d-flex justify-content-center container">
-    <h4>Your balance is ${{ balance }}</h4>
+    <h4>Your balance is $<i id="counter"></i></h4>
 </div>
 
 <script>
-    let counts = setInterval(updated);
-    let upto = 0;
-    const updated = () => {
-        let count = document.getElementById("counter");
-        count.innerHTML = ++upto;
-        if (upto === 1000) {
-            clearInterval(counts);
+        // Modified code from here https://www.geeksforgeeks.org/how-to-make-animated-counter-using-javascript/
+        // Animation that counts up to the dollar amount of the account
+        let counts=setInterval(updated);
+        let upto={{ balance }};
+        let counter = 0;
+        function updated(){
+            let count = document.getElementById("counter");
+            if (upto - counter < 20)
+                counter++
+            else
+                counter = counter+20
+
+            count.textContent = counter;
+
+            if(counter === upto)
+                clearInterval(counts);
         }
-    }
 </script>
 {% endblock %}

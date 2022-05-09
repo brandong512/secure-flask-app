@@ -1,4 +1,3 @@
-from logging.config import valid_ident
 from flask import (
     Flask,
     request,
@@ -75,7 +74,6 @@ def dashboard():
     if not logged_in():
         return render_template("login.html")
     owned_accounts = get_owner_accounts(g.user)
-    print(owned_accounts)
     owned_accounts = [account[0] for account in owned_accounts]
     return render_template(
         "dashboard.html", logged_in=logged_in(), user=g.user, accounts=owned_accounts
@@ -100,7 +98,7 @@ def details():
     )
 
 
-""" Transfer feature workflow
+""" Transfer feature
 
 During a transfer there are many areas that need to be validated. Here are the following scenarios
 that we've added some validation against:

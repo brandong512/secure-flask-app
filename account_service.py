@@ -23,7 +23,6 @@ def get_balance(account_number, owner):
 
 def get_owner_accounts(owner):
     try:
-        print("inside: ", owner)
         con = sqlite3.connect("bank.db")
         cur = con.cursor()
         cur.execute(

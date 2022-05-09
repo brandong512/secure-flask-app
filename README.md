@@ -41,4 +41,32 @@ Finally run,
 flask run
 ```
 
-and the server should start up
+and the server should start up.
+
+The file structure of your folder should look something like this:
+
+```.
+├── README.md
+├── account_service.py
+├── app.py
+├── bank.db
+├── bin
+│   ├── createdb.py
+│   └── makeaccounts.py
+├── env
+│   ├── bin
+│   ├── include
+│   ├── lib
+│   └── pyvenv.cfg
+├── requirements.txt
+├── static
+│   └── styles.css
+├── templates
+│   ├── base.html
+│   ├── dashboard.html
+│   ├── details.html
+│   ├── login.html
+│   └── transfer.html
+├── user_service.py
+└── validator.py
+```
